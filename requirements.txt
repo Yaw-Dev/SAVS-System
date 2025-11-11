@@ -1,3 +1,4 @@
 speech_recognition
 psutil
 pywin32
+keyboard
