@@ -1,35 +1,43 @@
 import time
+import state
 import commands # from ./commands.py
 import speech_recognition as sr
+import keyboard
 
 # recognizer setup
-recognizer = sr.Recognizer()
-recognizer.dynamic_energy_threshold = True
+recogniser = sr.Recognizer()
+recogniser.dynamic_energy_threshold = True
+# recogniser.non_speaking_duration = 0.3
 mic = sr.Microphone()
 
 with mic as source:
     print("Calibrating microphone for ambient noise...")
-    recognizer.adjust_for_ambient_noise(source, duration=0.5)
+    recogniser.adjust_for_ambient_noise(source, duration=0.5)
     print("SR engine is active!")
 
-def handle_audio(recognizer, audio):
+def handle_audio(recogniser, audio):
     try:
-        recognised_audio = recognizer.recognize_google(audio)
-        recognised_audio = recognised_audio.lower()
+        state.recognised_audio = recogniser.recognize_google(audio).lower()
+        print(f"Recognised: {state.recognised_audio}") #! debug
 
-        if recognised_audio in commands.command_names:
-            commands.command_names[recognised_audio]()
-            
+        text = state.recognised_audio.strip()
+        matches = [name for name in commands.command_names.keys()
+                    if text == name or text.startswith(name + " ")]
+        if matches:
+            cmd_name = max(matches, key=len)
+            func = commands.command_names[cmd_name]
+            func()
+
     except sr.UnknownValueError:
         pass
     except sr.RequestError as e:
         print(f"RequestError: {e}")
 
-stop_listening = recognizer.listen_in_background(mic, handle_audio)
+stop_listening = recogniser.listen_in_background(mic, handle_audio)
 
 try:
     while True:
-        time.sleep(0.001) # copilot kept insisting on 0.001 for some reason lol
+        time.sleep(0.1)
 except KeyboardInterrupt:
     stop_listening()
     print("Stopped via KeyboardInterrupt.")
