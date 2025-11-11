@@ -1,0 +1,14 @@
+{ 
+    "engine_settings": {
+        "speech_engine": "google",
+        "recogniser_dynamic_energy_threshold": true
+    },
+
+    "application_names": {
+        "notepad": "notepad.exe",
+        "chrome": "chrome.exe",
+        "code": "code.exe",
+        "explorer": "explorer.exe",
+        "steam": "C:\\Program Files (x86)\\Steam\\steam.exe"
+    }
+}
