@@ -1,6 +1,9 @@
 import os
+import json
+import state
 import psutil
 import win32gui
+import keyboard
 import win32process
 
 def foreground_task_name():
@@ -14,7 +17,13 @@ def foreground_task_name():
         return None
 
 def command_open():
-    os.system("start notepad.exe")
+    with open('config.json', 'r') as f:
+        config = json.load(f)
+    application_name = config['application_names'].get(state.recognised_audio.replace('open ', ''), '')
+    if "/" in application_name or "\\" in application_name:
+        os.startfile(application_name)
+    else:
+        os.system(f"start {application_name}")
 
 def command_exit():
     os.system("msg * SR engine stopped!")
@@ -26,15 +35,17 @@ def command_clear_temp():
 def command_kill_foreground():
     app_name = foreground_task_name()
     if app_name:
-        os.system(f"taskkill /F /IM {app_name}")
-        print(f"Killed foreground application: {app_name}")
-    else:
-        print("No foreground application found.")
+        os.system(f"taskkill /f /im {app_name}")
+
+def command_start_typing():
+    keyboard.write(state.recognised_audio.replace("type ", ""))
 
 # command-function mapping
 command_names = {
+    "type": command_start_typing,
     "open": command_open,
-    "exit": command_exit,
+    "exit engine": command_exit,
     "clear temp": command_clear_temp,
-    "kill foreground": command_kill_foreground
+    "kill foreground": command_kill_foreground,
+    "press enter": lambda: keyboard.press_and_release('enter'),
 }
