@@ -17,7 +17,7 @@ def foreground_task_name():
         return None
 
 def command_open():
-    with open('config.json', 'r') as f:
+    with open(rf'{os.path.dirname(__file__)}\config.json', 'r') as f:
         config = json.load(f)
     application_name = config['application_names'].get(state.recognised_audio.replace('open ', ''), '')
     if "/" in application_name or "\\" in application_name:
@@ -38,7 +38,7 @@ def command_kill_foreground():
         os.system(f"taskkill /f /im {app_name}")
 
 def command_start_typing():
-    keyboard.write(state.recognised_audio.replace("type ", ""))
+    keyboard.write(state.recognised_audio.replace("type ", ""), delay=0.05)
 
 # command-function mapping
 command_names = {
